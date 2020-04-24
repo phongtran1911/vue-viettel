@@ -1,5 +1,5 @@
 export const urlApi = {
-    baseUrl: 'http://api.wms.nhllogistics.vn/',
+    baseUrl: 'https://api.wms.nhllogistics.vn/',
     customer: {
         getList: 'web/users?token=',
     },
