@@ -1,11 +1,12 @@
 <template>
   <div class="app-container">
     <div class="filter-container">
-        <el-select v-model="listQuery.CatId" style="width: 500px" class="filter-item" @change="handleFilter" placeholder="Choose Category to search...">
+        <el-select v-model="listQuery.CatId" style="width: 500px" class="filter-item" @change="handleFilter" placeholder="Chọn loại để tìm kiếm...">
+            <el-option label="" value=""/>
             <el-option v-for="item in listCat" :key="item.Id" :label="item.Name" :value="item.Id" />
         </el-select>
         <el-button class="filter-item" style="margin-left: 10px;" type="primary" icon="el-icon-edit"  @click="handleCreate" :disabled="listQuery.CatId === undefined">
-            Add
+            Thêm mới
         </el-button>
     </div>
     <el-table
@@ -22,25 +23,25 @@
           <span>{{ row.Id }}</span>
         </template>
       </el-table-column>
-      <el-table-column label="Name" min-width="200px">
+      <el-table-column label="Tên nhóm sản phẩm" min-width="200px">
         <template slot-scope="{row}">
           <span class="link-type" @click="handleUpdate(row)">{{ row.Name }}</span>
         </template>
       </el-table-column>     
-      <el-table-column label="Home" class-name="status-col" width="100">
+      <el-table-column label="Trang chủ" class-name="status-col" width="100">
         <template slot-scope="{row}">
           <el-tag :type="row.HomeAppear | statusFilter">
             {{ row.HomeAppear }}
           </el-tag>
         </template>
       </el-table-column>
-      <el-table-column label="Actions" align="center" width="230" class-name="small-padding fixed-width">
+      <el-table-column label="Hoạt động" align="center" width="230" class-name="small-padding fixed-width">
         <template slot-scope="{row}">
           <el-button type="primary" size="mini" @click="handleUpdate(row)">
-            Edit
+            Sửa
           </el-button>
-          <el-button v-if="row.status!='deleted'" size="mini" type="danger" @click="handleModifyStatus(row,'deleted')">
-            Delete
+          <el-button v-if="row.status!='deleted'" size="mini" type="danger" @click="handleModifyStatus(row,'deleted')" disabled="true">
+            Xóa
           </el-button>
         </template>
       </el-table-column>
@@ -49,35 +50,35 @@
      <pagination v-show="total>0" :total="total" :page.sync="listQuery.page" :limit.sync="listQuery.limit" @pagination="getList" />
     
     <el-dialog :title="textMap[dialogStatus]" :visible.sync="dialogFormVisible">
-      <el-form ref="dataForm" :model="temp" label-position="left" label-width="100px" style="width: 400px; margin-left:50px;">
+      <el-form ref="dataForm" :model="temp" label-position="left" label-width="180px" style="width: 400px; margin-left:50px;">
         <el-form-item label="ID" prop="Id" :hidden="dialogStatus === 'create'">
           <span style="color:red">{{ temp.Id }}</span>
         </el-form-item>
         <el-form-item label="Group_ID" prop="group_id" :hidden="dialogStatus === 'create'">
           <span style="color:red">{{ temp.group_id }}</span>
         </el-form-item>
-        <el-form-item label="Name (*)" prop="Name">
+        <el-form-item label="Tên nhóm sản phẩm (*)" prop="Name">
           <el-input v-model="temp.Name" />
         </el-form-item>
-        <el-form-item :label="dialogStatus === 'create' ? 'Category' : 'Category (*)'" prop="type">
+        <el-form-item :label="dialogStatus === 'create' ? 'Loại' : 'Loại (*)'" prop="type">
           <el-select v-model="temp.category_id" class="filter-item" placeholder="Please select" :disabled="dialogStatus === 'create'">
             <el-option label="" value=""/>
             <el-option v-for="item in listCat" :key="item.Id" :label="item.Name" :value="item.category_id" />
           </el-select>
         </el-form-item>
-        <el-form-item label="Active" prop="Active">
+        <el-form-item label="Kích hoạt" prop="Active">
           <el-checkbox v-model="temp.Active" />
         </el-form-item>
-        <el-form-item label="Home" prop="HomeAppear">
+        <el-form-item label="Trang chủ" prop="HomeAppear">
           <el-checkbox v-model="temp.HomeAppear" />
         </el-form-item>
       </el-form>
       <div slot="footer" class="dialog-footer">
         <el-button @click="dialogFormVisible = false">
-          Cancel
+          Hủy
         </el-button>
         <el-button type="primary" @click="dialogStatus==='create'?createData():updateData()">
-          Confirm
+          Xác nhận
         </el-button>
       </div>
     </el-dialog>
@@ -111,7 +112,7 @@ export default {
             listLoading: false,
             listQuery: {
                 page: 1,
-                limit: 20,
+                limit: 10,
                 importance: undefined,
                 title: undefined,
                 type: undefined,
@@ -131,8 +132,8 @@ export default {
             dialogFormVisible: false,
             dialogStatus: '',
             textMap: {
-                update: 'Edit',
-                create: 'Create'
+                update: 'Sửa',
+                create: 'Tạo mới'
             },
         }
     },
@@ -146,9 +147,16 @@ export default {
             })
         },
         getList() {
+            if(this.listQuery.CatId == '')
+            {
+              this.list = null;
+              this.total = 0;
+              return;
+            }
             this.listLoading = true;
             getListProductGroup(this.listQuery.CatId, getToken()).then(response => {
-                this.list = response.Data.Data
+                var listHandle = response.Data.Data;
+                this.list = listHandle.filter((item, index) => index < this.listQuery.limit * this.listQuery.page && index >= this.listQuery.limit * (this.listQuery.page - 1))
                 this.total = response.Data.Total
 
                 // Just to simulate the time of the request

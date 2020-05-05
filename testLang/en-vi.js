@@ -16,13 +16,21 @@ export default {
             Country: 'Quản lý quốc gia',
             Province: 'Quản lý tỉnh thành phố',
             District: 'Quản lý quận huyện',
-            Category: 'Quản lý thể loại'
+            Category: 'Quản lý thể loại',
+            POList: 'Danh sách PO'
         },
         theme: 'Màu nền',
         tagsView: 'Mở Tags-View',
         fixedHeader: 'Tiêu đề cố định',
         sidebarLogo: 'Logo thanh trên',
-        settingtitle: 'Cài đặt trang'
+        settingtitle: 'Cài đặt trang',
+        navbar: {
+            profile: 'Thông tin tài khoản',
+            dashboard: 'Biểu đồ',
+            github: 'Github',
+            logOut: 'Đăng xuất',
+            size: 'Kích thước chữ'
+        }
     },
     en: {
         route: {
@@ -41,12 +49,20 @@ export default {
             Country: 'Country Manage',
             Province: 'Province Manage',
             District: 'District Manage',
-            Category: 'Category Manage'
+            Category: 'Category Manage',
+            POList: 'PO List'
         },
         theme: 'Theme Color',
         tagsView: 'Open Tags-View',
         fixedHeader: 'Fixed Header',
         sidebarLogo: 'Sidebar Logo',
-        settingtitle: 'Page style setting'
+        settingtitle: 'Page style setting',
+        navbar: {
+            profile: 'Profile',
+            dashboard: 'Dashboard',
+            github: 'Github',
+            logOut: 'Log out',
+            size: 'Font size'
+        }
     }    
 }

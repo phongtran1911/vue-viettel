@@ -1,14 +1,16 @@
 <template>
     <div class="app-container">
         <div class="filter-container">
-            <el-select v-model="listQuery.CatId" style="width: 300px" class="filter-item" @change="getListProGroup" placeholder="Choose Category...">
+            <el-select v-model="listQuery.CatId" style="width: 300px" class="filter-item" @change="getListProGroup" placeholder="Chọn loại...">
+                <el-option label="" value=""/>
                 <el-option v-for="item in listCat" :key="item.Id" :label="item.Name" :value="item.Id" />
             </el-select>
-            <el-select v-model="listQuery.GroupID" style="width: 300px" class="filter-item" @change="handleFilter" placeholder="Choose Group to search...">
+            <el-select v-model="listQuery.GroupID" style="width: 300px" class="filter-item" @change="handleFilter" placeholder="Chọn nhóm để tìm kiếm...">
+                <el-option label="" value=""/>
                 <el-option v-for="item in listGroup" :key="item.Id" :label="item.Name" :value="item.Id" />
             </el-select>
             <el-button class="filter-item" style="margin-left: 10px;" type="primary" icon="el-icon-edit"  @click="handleCreate" :disabled="listQuery.GroupID === undefined">
-                Add
+                Thêm mới
             </el-button>
         </div>
         <el-table
@@ -25,25 +27,30 @@
           <span>{{ row.Id }}</span>
         </template>
       </el-table-column>
-      <el-table-column label="Name" min-width="200px">
+      <el-table-column label="Tên sản phẩm" min-width="200px">
         <template slot-scope="{row}">
           <span class="link-type" @click="handleUpdate(row)">{{ row.Name }}</span>
         </template>
       </el-table-column>     
-      <el-table-column label="Home" class-name="status-col" width="100">
+      <el-table-column label="Mã sản phẩm" min-width="200px">
+        <template slot-scope="{row}">
+            <span> {{ row.product_code }} </span>
+        </template>
+      </el-table-column>
+      <el-table-column label="Hiển thị" class-name="status-col" width="100">
         <template slot-scope="{row}">
           <el-tag :type="row.HomeAppear | statusFilter">
             {{ row.HomeAppear }}
           </el-tag>
         </template>
       </el-table-column>
-      <el-table-column label="Actions" align="center" width="230" class-name="small-padding fixed-width">
+      <el-table-column label="Hành động" align="center" width="230" class-name="small-padding fixed-width">
         <template slot-scope="{row}">
           <el-button type="primary" size="mini" @click="handleUpdate(row)">
-            Edit
+            Sửa
           </el-button>
-          <el-button v-if="row.status!='deleted'" size="mini" type="danger" @click="handleModifyStatus(row,'deleted')">
-            Delete
+          <el-button v-if="row.status!='deleted'" size="mini" type="danger" @click="handleModifyStatus(row,'deleted')" disabled="true">
+            Xóa
           </el-button>
         </template>
       </el-table-column>
@@ -62,24 +69,24 @@
           <span style="color:red;margin-left: 5px;">{{ temp.Groupid }}</span>
         </el-form-item>
         
-        <el-form-item label="Name (*)" prop="Name">
+        <el-form-item label="Tên sản phẩm (*)" prop="Name">
           <el-input v-model="temp.Name" />
         </el-form-item>
-        <el-form-item :label="dialogStatus === 'create' ? 'Group Product' : 'Group Product (*)'" prop="type">
+        <el-form-item :label="dialogStatus === 'create' ? 'Nhóm sản phẩm' : 'Nhóm sản phẩm (*)'" prop="type">
           <el-select v-model="temp.group_id" class="filter-item" placeholder="Please select" :disabled="dialogStatus === 'create'">
             <el-option v-for="item in listGroup" :key="item.Id" :label="item.Name" :value="item.group_id" />
           </el-select>
         </el-form-item>
-        <el-form-item label="PriceSale" prop="PriceSale">
+        <el-form-item label="Giá" prop="PriceSale">
           <el-input v-model="temp.PriceSale" type="number"/>
         </el-form-item>
-        <el-form-item label="Description">
+        <el-form-item label="Mô tả">
           <el-input v-model="temp.Description" :autosize="{ minRows: 2, maxRows: 4}" type="textarea" placeholder="Please input" />
         </el-form-item>
-        <el-form-item label="Active" prop="Active">
+        <el-form-item label="Kích hoạt" prop="Active">
           <el-checkbox v-model="temp.Active" />
         </el-form-item>
-        <el-form-item label="Home" prop="HomeAppear">
+        <el-form-item label="Trang chủ" prop="HomeAppear">
           <el-checkbox v-model="temp.HomeAppear" />
         </el-form-item>
       </el-form>
@@ -122,7 +129,7 @@ export default {
             listLoading: false,
             listQuery: {
                 page: 1,
-                limit: 20,
+                limit: 10,
                 importance: undefined,
                 title: undefined,
                 type: undefined,
@@ -161,14 +168,26 @@ export default {
         getListProGroup() {
             this.listQuery.GroupID = undefined;
             this.list = null;
-            getListProductGroup(this.listQuery.CatId, getToken()).then(response => {
+            this.listGroup = null;
+            this.total = 0;
+            if(this.listQuery.CatId != '')
+            {
+              getListProductGroup(this.listQuery.CatId, getToken()).then(response => {
                 this.listGroup = response.Data.Data
-            })
+              })
+            }            
         },
         getList() {
+            if(this.listQuery.GroupID == '')
+            {
+              this.list = null;
+              this.total = 0;
+              return;
+            }
             this.listLoading = true;
             getListProduct(this.listQuery.GroupID, getToken()).then(response => {
-                this.list = response.Data.Data
+                var listHandle = response.Data.Data;
+                this.list = listHandle.filter((item, index) => index < this.listQuery.limit * this.listQuery.page && index >= this.listQuery.limit * (this.listQuery.page - 1))
                 this.total = response.Data.Total
 
                 // Just to simulate the time of the request

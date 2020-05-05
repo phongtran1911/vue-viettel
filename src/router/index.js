@@ -204,7 +204,7 @@ export const asyncRoutes = [
   {
     path: '/category',
     component: Layout,
-    redirect: '/category/province',
+    redirect: '/category/po',
     name: 'Category',
     meta: {
       title: 'Category',
@@ -246,6 +246,12 @@ export const asyncRoutes = [
         component: () => import('@/views/category/product'),
         name: 'Product',
         meta: { title: 'Product'}
+      },
+      {
+        path: 'po',
+        component: () => import('@/views/category/po'),
+        name: 'POList',
+        meta: { title: 'POList'}
       }
     ]
   },
