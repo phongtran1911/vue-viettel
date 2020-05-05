@@ -73,8 +73,8 @@ export default {
     }
     return {
       loginForm: {
-        username: 'webui',
-        password: 'wbui@123'
+        username: '',
+        password: ''
       },
       loginRules: {        
         password: [{ required: true, trigger: 'blur', validator: validatePassword }]
